@@ -1,8 +1,12 @@
 import { VexCore } from './vex-core.js';
+import { StatsPanel } from './stats.js';
 
 // --- Init visualization ---
 const container = document.getElementById('canvas-container');
 const vex = new VexCore(container);
+
+// --- Init stats panel ---
+const stats = new StatsPanel();
 
 // --- Chat state ---
 const chatLog = document.getElementById('chat-log');

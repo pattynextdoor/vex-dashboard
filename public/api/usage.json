@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-02-17T07:36:04.522719+00:00",
+  "today": {
+    "cost": 28.315524,
+    "cost_breakdown": {
+      "input": 0.002102,
+      "output": 1.01344,
+      "cache_read": 10.487469,
+      "cache_write": 16.812513
+    },
+    "tokens": {
+      "input": 468,
+      "output": 41010,
+      "cache_read": 21022986,
+      "cache_write": 2696488,
+      "total": 23760952
+    },
+    "date": "2026-02-17"
+  },
+  "this_month": {
+    "cost": 28.315524,
+    "cost_breakdown": {
+      "input": 0.002102,
+      "output": 1.01344,
+      "cache_read": 10.487469,
+      "cache_write": 16.812513
+    },
+    "tokens": {
+      "input": 468,
+      "output": 41010,
+      "cache_read": 21022986,
+      "cache_write": 2696488,
+      "total": 23760952
+    },
+    "month": "2026-02"
+  },
+  "all_time": {
+    "cost": 28.315524,
+    "cost_breakdown": {
+      "input": 0.002102,
+      "output": 1.01344,
+      "cache_read": 10.487469,
+      "cache_write": 16.812513
+    },
+    "tokens": {
+      "input": 468,
+      "output": 41010,
+      "cache_read": 21022986,
+      "cache_write": 2696488,
+      "total": 23760952
+    },
+    "message_count": 262,
+    "session_count": 3,
+    "avg_cost_per_message": 0.108075
+  },
+  "sessions": [
+    {
+      "session_id": "32266f16-d14d-4a95-9af2-3699330410f7",
+      "model": "claude-sonnet-4-20250514",
+      "start": "2026-02-17T07:35:38.239Z",
+      "message_count": 10,
+      "cost_total": 0.114914,
+      "input_tokens": 119,
+      "output_tokens": 1181
+    },
+    {
+      "session_id": "7b613692-eeb1-4adb-a2a7-b7e0ee6f4894",
+      "model": "claude-opus-4-6",
+      "start": "2026-02-17T03:08:02.271Z",
+      "message_count": 16,
+      "cost_total": 0.58679,
+      "input_tokens": 24,
+      "output_tokens": 1199
+    },
+    {
+      "session_id": "5c10d2c2-3e40-4be0-8f1f-1621f94be6d7",
+      "model": "claude-opus-4-6",
+      "start": "2026-02-17T01:32:26.572Z",
+      "message_count": 236,
+      "cost_total": 27.61382,
+      "input_tokens": 325,
+      "output_tokens": 38630
+    }
+  ],
+  "daily": {
+    "2026-02-17": 28.315524
+  }
+}
