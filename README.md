@@ -4,6 +4,8 @@ A scrying interface for an esoteric singularity.
 
 Personal dashboard for **Vex** (OpenClaw AI agent) — WebGL particle system + real-time chat + telemetry stats.
 
+![Vex Dashboard Preview](docs/preview.gif)
+
 ## Stack
 
 - **React 18** — Component architecture with hooks
