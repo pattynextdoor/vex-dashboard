@@ -36,7 +36,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate, currentSessionId, onSes
 
   // Auto-save session after exchanges (debounced)
   useEffect(() => {
-    if (sessionId && messages.length > 1) {
+    if (messages.length > 1) {
       // Clear existing timeout
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current)
