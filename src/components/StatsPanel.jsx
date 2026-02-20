@@ -134,7 +134,7 @@ function StatsPanel({ isOpen, onToggle }) {
   if (loading) {
     return (
       <>
-        <div id="stats-toggle" onClick={onToggle} title="Toggle stats panel (Tab)">
+        <div id="stats-toggle" className={isOpen ? 'panel-open' : ''} onClick={onToggle} title="Toggle stats panel (Tab)">
           ⚡
         </div>
         <div id="stats-panel" className={isOpen ? 'visible' : ''}>
@@ -147,7 +147,7 @@ function StatsPanel({ isOpen, onToggle }) {
   if (!data) {
     return (
       <>
-        <div id="stats-toggle" onClick={onToggle} title="Toggle stats panel (Tab)">
+        <div id="stats-toggle" className={isOpen ? 'panel-open' : ''} onClick={onToggle} title="Toggle stats panel (Tab)">
           ⚡
         </div>
         <div id="stats-panel" className={isOpen ? 'visible' : ''}>
@@ -161,7 +161,7 @@ function StatsPanel({ isOpen, onToggle }) {
 
   return (
     <>
-      <div id="stats-toggle" onClick={onToggle} title="Toggle stats panel (Tab)">
+      <div id="stats-toggle" className={isOpen ? 'panel-open' : ''} onClick={onToggle} title="Toggle stats panel (Tab)">
         ⚡
       </div>
       <div id="stats-panel" className={isOpen ? 'visible' : ''}>

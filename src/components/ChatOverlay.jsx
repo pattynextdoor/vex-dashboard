@@ -9,6 +9,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
     }
   ])
   const [inputValue, setInputValue] = useState('')
+  const [isThinking, setIsThinking] = useState(false)
   
   const chatLogRef = useRef(null)
 
@@ -33,6 +34,9 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
     
     addMessage('user', text)
     setInputValue('')
+    
+    // Add thinking indicator
+    setIsThinking(true)
     
     // Activate visualization — thinking
     onActivityUpdate(0.8)
@@ -60,6 +64,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
       const data = await response.json()
       const reply = data.choices?.[0]?.message?.content || 'No response received.'
       
+      setIsThinking(false)
       addMessage('vex', reply)
       onActivityUpdate(0.3)
       onStatusUpdate('connected', 'connected')
@@ -72,6 +77,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
       
     } catch (err) {
       console.error('Chat API error:', err)
+      setIsThinking(false)
       addMessage('vex', `Connection error: ${err.message}`)
       onActivityUpdate(0)
       onStatusUpdate('error', 'disconnected')
@@ -103,6 +109,20 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
               </div>
             </div>
           ))}
+          {isThinking && (
+            <div className="message vex">
+              <div className="label">🜏 vex</div>
+              <div className="message-content">
+                <div className="thinking-orb">
+                  <svg width="24" height="24" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="rgba(139, 92, 246, 0.6)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="12 6" className="orb-ring"/>
+                    <circle cx="12" cy="12" r="4" fill="rgba(245, 158, 11, 0.4)" className="orb-core"/>
+                    <circle cx="12" cy="12" r="2" fill="rgba(139, 92, 246, 0.8)" className="orb-center"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div id="input-container">
           <input

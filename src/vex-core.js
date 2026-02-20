@@ -106,7 +106,7 @@ export class VexCore {
     const elapsed = this.clock.getElapsedTime();
 
     // Smooth activity transition
-    this.activity += (this.targetActivity - this.activity) * 0.03;
+    this.activity += (this.targetActivity - this.activity) * 0.06;
 
     if (this.uniforms) {
       this.uniforms.uTime.value = elapsed;

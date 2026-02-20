@@ -37,7 +37,11 @@
   justify-content: center;
   cursor: pointer;
   z-index: 11;
-  transition: color 0.3s, border-color 0.3s;
+  transition: color 0.3s, border-color 0.3s, right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#stats-toggle.panel-open {
+  right: 395px;
 }
 
 #stats-toggle:hover {

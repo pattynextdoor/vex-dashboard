@@ -81,9 +81,9 @@ void main() {
 
   // Vortex Math: Rotate with a spiral-preserving speed curve
   // Base rotation keeps all particles moving together, differential adds vortex twist
-  float baseRotation = uTime * 0.1;
+  float baseRotation = uTime * (0.1 + uActivity * 0.4); // Faster rotation when active
   float differential = 0.4 / (dist + 0.5);
-  float angle = baseRotation + uTime * differential * 0.1;
+  float angle = baseRotation + uTime * differential * (0.1 + uActivity * 0.3);
 
   // Apply rotation around Y axis
   float sa = sin(angle);
@@ -98,9 +98,12 @@ void main() {
   float ny = snoise(vec3(pos.y * noiseScale, pos.z * noiseScale + t, pos.x * noiseScale));
   float nz = snoise(vec3(pos.z * noiseScale, pos.x * noiseScale, pos.y * noiseScale + t));
 
-  // Apply noise, stronger at edges
-  float noiseStrength = smoothstep(0.0, 2.0, dist) * 0.25 * (1.0 + uActivity);
+  // Apply noise, stronger at edges, expand vortex when active
+  float noiseStrength = smoothstep(0.0, 2.0, dist) * 0.25 * (1.0 + uActivity * 2.0);
   pos += vec3(nx, ny, nz) * noiseStrength;
+  
+  // Expand vortex outward during high activity
+  pos.xz *= 1.0 + uActivity * 0.3;
 
   // Mouse interaction: Attract particles toward mouse
   vec3 mouseWorld = vec3(uMouse.x * 3.0, uMouse.y * 3.0, 0.0);
@@ -111,15 +114,19 @@ void main() {
 
   // Hollow eye: push particles outward from center to create a dark void
   float coreDist = length(pos);
-  float eyeRadius = 0.6 + sin(uTime * 0.5) * 0.1; // Pulsing eye size
+  float eyePulseFreq = 0.5 + uActivity * 1.5; // Faster eye pulse when active
+  float eyePulseAmp = 0.1 + uActivity * 0.2; // More dramatic pulse when active
+  float eyeRadius = 0.6 + sin(uTime * eyePulseFreq) * eyePulseAmp;
   if (coreDist < eyeRadius) {
     // Push particles to the rim of the eye
     float push = smoothstep(0.0, eyeRadius, coreDist);
     pos *= (eyeRadius / max(coreDist, 0.01)) * mix(1.0, push, 0.5);
   }
 
-  // Breathing pulse: modulate radial position over time
-  float breathe = sin(uTime * 0.4 + dist * 2.0) * 0.05;
+  // Breathing pulse: modulate radial position over time, faster and stronger when active
+  float breatheFreq = 0.4 + uActivity * 1.2; // Faster pulse when active
+  float breatheAmp = 0.05 + uActivity * 0.1; // Stronger pulse when active  
+  float breathe = sin(uTime * breatheFreq + dist * 2.0) * breatheAmp;
   pos.xz *= 1.0 + breathe;
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -141,12 +148,18 @@ void main() {
   float outerMix = smoothstep(1.2, 2.5, dist);
   vColor = mix(innerColor, midColor, innerMix);
   vColor = mix(vColor, currentEdgeColor, outerMix);
+  
+  // More aggressive blue shift during high activity
+  vec3 activityColor = vec3(0.0, 0.5, 1.0); // Bright blue
+  vColor = mix(vColor, activityColor, uActivity * 0.4);
 
   // Add some variation based on random attribute
   vColor += aRandom * 0.1;
 
-  // Fade out at edges, hard cutoff at the eye, pulse the inner ring brightness
-  float innerGlow = smoothstep(eyeRadius, eyeRadius + 0.4, coreDist) * (1.0 + sin(uTime * 0.8) * 0.2);
+  // Fade out at edges, hard cutoff at the eye, pulse the inner ring brightness more dramatically
+  float glowPulseFreq = 0.8 + uActivity * 1.0; // Faster glow pulse when active
+  float glowPulseAmp = 0.2 + uActivity * 0.4; // More dramatic glow pulse when active
+  float innerGlow = smoothstep(eyeRadius, eyeRadius + 0.4, coreDist) * (1.0 + sin(uTime * glowPulseFreq) * glowPulseAmp);
   vAlpha = smoothstep(3.5, 1.0, dist) * innerGlow;
-  vAlpha *= 0.45 + uActivity * 0.15;
+  vAlpha *= 0.45 + uActivity * 0.25; // Higher alpha during activity
 }

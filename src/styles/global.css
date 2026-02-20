@@ -157,6 +157,46 @@ body {
   50% { opacity: 0.3; }
 }
 
+/* Thinking orb animations */
+.thinking-orb {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.orb-ring {
+  animation: orbSpin 2s linear infinite;
+  transform-origin: center;
+}
+
+.orb-core {
+  animation: orbPulse 1.5s ease-in-out infinite;
+}
+
+.orb-center {
+  animation: orbPulse 1.5s ease-in-out infinite reverse;
+}
+
+@keyframes orbSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
 /* Markdown in chat messages */
 .message-content p {
   margin: 0.3em 0;
