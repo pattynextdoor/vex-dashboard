@@ -1,76 +1,83 @@
 # 🜏 Vex Dashboard
 
-A scrying interface for an esoteric singularity.
+A personal interface for an AI agent that lives on a DigitalOcean droplet.
 
-Personal dashboard for **Vex** (OpenClaw AI agent) — WebGL particle system + real-time chat + telemetry stats.
+WebGL particle visualization + real-time chat + usage telemetry — built as the primary interface for [OpenClaw](https://github.com/openclaw/openclaw).
 
 ![Vex Dashboard Preview](docs/preview.gif)
 
-## Stack
-
-- **React 18** — Component architecture with hooks
-- **Bun** — Fast runtime, package manager, and bundler
-- **Vite** — Development server and build tool
-- **Three.js** — WebGL particle system with custom shaders
-- **Client-side rendering only** — No SSR, pure CSR
-
-## Getting Started
-
-### Prerequisites
-- **Bun** runtime (will auto-install if not present)
-
-### Setup
-```bash
-# Install dependencies
-bun install
-
-# Start development server
-bun run dev
-
-# Build for production
-bun run build
-
-# Preview production build
-bun run preview
-```
-
-Visit http://localhost:5173
-
 ## Features
 
-- ✅ **Reactive particle visualization** — 2000 particles respond to chat activity
-- ✅ **Chat interface** — Placeholder chat with simulated responses
-- ✅ **Telemetry panel** — Usage stats, token counts, session history
-- ✅ **Dark aesthetic** — Terminal-inspired monospace UI
-- ✅ **Keyboard shortcuts** — Tab to toggle stats panel
-- 🔲 **OpenClaw integration** — Real chat connection (coming soon)
+- **Reactive particle system** — 8,000 particles with custom GLSL shaders, hollow-eye vortex, mouse interaction. Animation shifts dramatically when the agent is thinking.
+- **Chat interface** — Talk directly to the agent (Claude Opus). Full conversation context, session persistence (save/load/delete).
+- **Usage telemetry** — Real-time cost tracking, token counts, session history, daily spend charts.
+- **Thinking indicator** — Animated SVG orb + particle animation shift while the agent processes.
+- **Dark terminal aesthetic** — Near-black backgrounds, monospace type, muted red/green accents. No borders, no shadows.
+
+## Stack
+
+- **React 18** + **Vite** — CSR only, no SSR
+- **Bun** — Runtime, package manager, server
+- **Three.js** — WebGL with custom vertex/fragment shaders
+- **OpenClaw** — AI agent gateway (chat completions API)
 
 ## Architecture
 
 ```
 src/
-├── index.jsx              # React entry point
 ├── components/
-│   ├── App.jsx            # Root component, state management
-│   ├── ParticleCanvas.jsx # Three.js wrapper component
-│   ├── ChatOverlay.jsx    # Chat UI and message handling
-│   ├── StatsPanel.jsx     # Usage statistics panel
-│   └── StatusIndicator.jsx# Connection status dot
+│   ├── App.jsx              # Root state management
+│   ├── ParticleCanvas.jsx   # Three.js wrapper
+│   ├── ChatOverlay.jsx      # Chat UI + API calls
+│   ├── SessionDrawer.jsx    # Session history sidebar
+│   ├── StatsPanel.jsx       # Usage telemetry panel
+│   └── StatusIndicator.jsx  # Connection status
+├── shaders/
+│   ├── particle.vert        # Vertex shader (vortex, noise, breathing)
+│   └── particle.frag        # Fragment shader (glow, color)
 ├── styles/
-│   └── global.css         # Base application styles
-├── vex-core.js            # Three.js particle system (unchanged)
-├── stats.css              # Dark telemetry panel styles
-└── shaders/
-    ├── particle.vert      # Vertex shader for particles
-    └── particle.frag      # Fragment shader for particles
+│   └── global.css           # Base styles + markdown rendering
+├── vex-core.js              # Three.js particle system core
+├── stats.css                # Telemetry panel styles
+└── sessions.css             # Session drawer styles
 ```
 
-## Notes
+## Hosting & Security
 
-- The Three.js particle system (`vex-core.js`) remains unchanged from the vanilla version
-- React components wrap the existing WebGL logic via refs and useEffect
-- Stats panel preserves the exact dark terminal aesthetic
-- All particle animations and shader logic work identically to the original
+This dashboard is hosted via **[Tailscale](https://tailscale.com/)** — it's only accessible on a private tailnet. There is no public URL. You cannot reach my OpenClaw agent from the internet.
+
+The Bun server (`serve.js`) runs on the droplet and handles:
+- `/api/usage` — proxies to a local usage tracker script
+- `/api/sessions/*` — chat session CRUD (stored as JSON files on disk)
+- `/v1/*` — proxies to the OpenClaw gateway on localhost (authenticated with a token that never leaves the server)
+- `/*` — serves the static Vite build
+
+The gateway token is stored in `.env` (gitignored, never committed). Even if you clone this repo and run it, you'd need your own OpenClaw instance and gateway token.
+
+## Running Your Own
+
+```bash
+# Install dependencies
+bun install
+
+# Development
+bun run dev          # http://localhost:5173
+
+# Production build
+bun run build
+
+# Serve (requires OpenClaw gateway on localhost:18789)
+node serve.js        # http://localhost:3333
+```
+
+You'll need:
+1. An [OpenClaw](https://github.com/openclaw/openclaw) instance with `http.endpoints.chatCompletions.enabled: true`
+2. A `.env` file with `VITE_GATEWAY_TOKEN=<your-gateway-token>`
+3. Optionally, Tailscale for private hosting
+
+## Credits
+
+Built by [pattynextdoor](https://github.com/pattynextdoor) and Vex (the agent that lives inside it).
 
 ---
 

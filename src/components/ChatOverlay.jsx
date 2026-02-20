@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 
-function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
+function ChatOverlay({ onStatusUpdate, onActivityUpdate, currentSessionId, onSessionChange }) {
   const [messages, setMessages] = useState([
     {
       role: 'vex',
@@ -10,13 +10,44 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isThinking, setIsThinking] = useState(false)
+  const [sessionId, setSessionId] = useState(currentSessionId)
   
   const chatLogRef = useRef(null)
+  const saveTimeoutRef = useRef(null)
 
   useEffect(() => {
     // Initialize status
     onStatusUpdate('connected', 'idle')
   }, [onStatusUpdate])
+
+  // Load session when currentSessionId changes
+  useEffect(() => {
+    if (currentSessionId && currentSessionId !== sessionId) {
+      loadSession(currentSessionId)
+    } else if (!currentSessionId) {
+      // Start new chat
+      setMessages([{
+        role: 'vex',
+        text: 'The interface stirs. Speak, and the particles will answer.'
+      }])
+      setSessionId(null)
+    }
+  }, [currentSessionId])
+
+  // Auto-save session after exchanges (debounced)
+  useEffect(() => {
+    if (sessionId && messages.length > 1) {
+      // Clear existing timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+      
+      // Set new timeout for auto-save
+      saveTimeoutRef.current = setTimeout(() => {
+        saveSession()
+      }, 1000) // 1 second debounce
+    }
+  }, [messages, sessionId])
 
   useEffect(() => {
     // Auto-scroll chat log
@@ -27,6 +58,61 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
 
   const addMessage = (role, text) => {
     setMessages(prev => [...prev, { role, text }])
+  }
+
+  // Load a session from API
+  const loadSession = async (sessionIdToLoad) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionIdToLoad}`)
+      if (response.ok) {
+        const sessionData = await response.json()
+        setMessages(sessionData.messages || [])
+        setSessionId(sessionIdToLoad)
+      }
+    } catch (err) {
+      console.error('Failed to load session:', err)
+    }
+  }
+
+  // Save current session
+  const saveSession = async () => {
+    try {
+      if (sessionId) {
+        // Update existing session
+        await fetch(`/api/sessions/${sessionId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages })
+        })
+      } else if (messages.length > 1) {
+        // Create new session (only if there's at least one exchange)
+        const response = await fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages })
+        })
+        
+        if (response.ok) {
+          const sessionData = await response.json()
+          setSessionId(sessionData.id)
+          if (onSessionChange) {
+            onSessionChange(sessionData.id)
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to save session:', err)
+    }
+  }
+
+  // Convert messages to API format
+  const formatMessagesForAPI = () => {
+    return messages
+      .filter(msg => msg.role === 'user' || msg.role === 'vex')
+      .map(msg => ({
+        role: msg.role === 'vex' ? 'assistant' : 'user',
+        content: msg.text
+      }))
   }
 
   const sendMessage = async (text) => {
@@ -43,7 +129,13 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
     onStatusUpdate('thinking', 'thinking')
     
     try {
-      // Real OpenClaw API call
+      // Build conversation history including the new message
+      const conversationHistory = [
+        ...formatMessagesForAPI(),
+        { role: 'user', content: text }
+      ]
+
+      // Real OpenClaw API call with full conversation context
       const response = await fetch('/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -52,7 +144,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
         },
         body: JSON.stringify({
           model: 'anthropic/claude-opus-4-6',
-          messages: [{ role: 'user', content: text }],
+          messages: conversationHistory,
           stream: false
         })
       })
@@ -68,6 +160,8 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
       addMessage('vex', reply)
       onActivityUpdate(0.3)
       onStatusUpdate('connected', 'connected')
+      
+      // Auto-save will be triggered by the useEffect that watches messages
       
       // Fade back to idle
       setTimeout(() => {
@@ -91,9 +185,25 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
     }
   }
 
+  const startNewChat = () => {
+    setMessages([{
+      role: 'vex',
+      text: 'The interface stirs. Speak, and the particles will answer.'
+    }])
+    setSessionId(null)
+    if (onSessionChange) {
+      onSessionChange(null)
+    }
+  }
+
   return (
     <div id="ui-overlay">
       <div id="chat-container">
+        <div className="chat-header">
+          <button className="new-chat-btn" onClick={startNewChat} title="Start new chat">
+            +
+          </button>
+        </div>
         <div id="chat-log" ref={chatLogRef}>
           {messages.map((message, index) => (
             <div key={index} className={`message ${message.role}`}>

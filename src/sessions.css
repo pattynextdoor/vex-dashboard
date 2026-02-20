@@ -1,0 +1,231 @@
+/* Dark terminal session drawer styles - matching stats.css aesthetic */
+#sessions-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100vh;
+  background: #0d0d0d;
+  color: #999;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.3;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 10;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+#sessions-drawer.visible {
+  transform: translateX(0);
+}
+
+#sessions-toggle {
+  position: fixed;
+  top: 50px;
+  left: 15px;
+  width: 24px;
+  height: 24px;
+  background: rgba(13, 13, 13, 0.9);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #6a6a6a;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 11;
+  transition: color 0.3s, border-color 0.3s, left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#sessions-toggle.drawer-open {
+  left: 315px;
+}
+
+#sessions-toggle:hover {
+  color: #999;
+  border-color: rgba(255,255,255,0.15);
+}
+
+.sessions-content {
+  padding: 24px 20px;
+}
+
+.sessions-section {
+  margin-bottom: 32px;
+}
+
+.sessions-section:last-child {
+  margin-bottom: 0;
+}
+
+.sessions-section h2 {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #6a6a6a;
+  margin-bottom: 12px;
+  font-weight: normal;
+  opacity: 0.7;
+}
+
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #999;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.new-chat-btn:hover {
+  color: #c45c5c;
+  border-color: rgba(196, 92, 92, 0.3);
+  background: rgba(196, 92, 92, 0.05);
+}
+
+.new-chat-icon {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.01);
+  border: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.session-item:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.session-item.active {
+  background: rgba(196, 92, 92, 0.1);
+  border-color: rgba(196, 92, 92, 0.3);
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.session-title {
+  color: #999;
+  font-size: 11px;
+  line-height: 1.3;
+  flex: 1;
+  margin-right: 8px;
+  word-break: break-word;
+}
+
+.session-delete {
+  background: none;
+  border: none;
+  color: #6a6a6a;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+  flex-shrink: 0;
+}
+
+.session-delete:hover {
+  color: #c45c5c;
+}
+
+.session-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-time {
+  color: #6a6a6a;
+  font-size: 10px;
+}
+
+.session-count {
+  color: #6a6a6a;
+  font-size: 10px;
+}
+
+.loading {
+  color: #6a6a6a;
+  text-align: center;
+  padding: 40px 20px;
+  opacity: 0.5;
+}
+
+.empty-state {
+  color: #6a6a6a;
+  text-align: center;
+  padding: 20px;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+/* Scrollbar styling */
+#sessions-drawer::-webkit-scrollbar {
+  width: 4px;
+}
+
+#sessions-drawer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sessions-drawer::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+}
+
+#sessions-drawer::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Animation for sessions appearing */
+.session-item {
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: sessionAppear 0.6s ease forwards;
+}
+
+.session-item:nth-child(1) { animation-delay: 0.0s; }
+.session-item:nth-child(2) { animation-delay: 0.05s; }
+.session-item:nth-child(3) { animation-delay: 0.1s; }
+.session-item:nth-child(4) { animation-delay: 0.15s; }
+.session-item:nth-child(5) { animation-delay: 0.2s; }
+.session-item:nth-child(n+6) { animation-delay: 0.25s; }
+
+@keyframes sessionAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
