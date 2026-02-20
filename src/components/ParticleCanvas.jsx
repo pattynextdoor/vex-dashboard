@@ -14,8 +14,11 @@ const ParticleCanvas = forwardRef((props, ref) => {
   }), [])
 
   useEffect(() => {
-    if (containerRef.current && !vexCoreRef.current) {
-      // Initialize the VexCore Three.js system
+    if (containerRef.current) {
+      // Always create a fresh instance (handles React StrictMode re-mounts)
+      if (vexCoreRef.current && vexCoreRef.current.dispose) {
+        vexCoreRef.current.dispose()
+      }
       vexCoreRef.current = new VexCore(containerRef.current)
     }
 
@@ -23,6 +26,7 @@ const ParticleCanvas = forwardRef((props, ref) => {
     return () => {
       if (vexCoreRef.current && vexCoreRef.current.dispose) {
         vexCoreRef.current.dispose()
+        vexCoreRef.current = null
       }
     }
   }, [])
