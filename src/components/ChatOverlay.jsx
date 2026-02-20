@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
   const [messages, setMessages] = useState([
@@ -93,7 +94,13 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
               <div className="label">
                 {message.role === 'user' ? 'you' : '🜏 vex'}
               </div>
-              <div>{message.text}</div>
+              <div className="message-content">
+                {message.role === 'vex' ? (
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                ) : (
+                  message.text
+                )}
+              </div>
             </div>
           ))}
         </div>
