@@ -51,7 +51,7 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
           'Authorization': `Bearer ${import.meta.env.VITE_GATEWAY_TOKEN}`
         },
         body: JSON.stringify({
-          model: 'anthropic/claude-sonnet-4-20250514',
+          model: 'anthropic/claude-opus-4-6',
           messages: [{ role: 'user', content: text }],
           stream: false
         })
