@@ -4,9 +4,19 @@ import '../stats.css'
 function StatsPanel({ isOpen, onToggle }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState(Date.now())
 
   useEffect(() => {
     loadData()
+  }, [])
+
+  useEffect(() => {
+    // Auto-refresh every 60 seconds
+    const interval = setInterval(() => {
+      loadData()
+    }, 60000)
+
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -30,15 +40,21 @@ function StatsPanel({ isOpen, onToggle }) {
   }, [isOpen])
 
   const loadData = async () => {
+    setLoading(true)
     try {
-      const response = await fetch('/api/usage.json')
+      const response = await fetch('/api/usage')
       const jsonData = await response.json()
       setData(jsonData)
+      setLastRefresh(Date.now())
       setLoading(false)
     } catch (error) {
       console.error('Failed to load usage stats:', error)
       setLoading(false)
     }
+  }
+
+  const handleRefresh = () => {
+    loadData()
   }
 
   const formatCost = (cost) => {
@@ -151,7 +167,12 @@ function StatsPanel({ isOpen, onToggle }) {
       <div id="stats-panel" className={isOpen ? 'visible' : ''}>
         <div className="stats-content">
           <div className="stats-section">
-            <h2>VITALS</h2>
+            <div className="stats-header">
+              <h2>VITALS</h2>
+              <button className="refresh-btn" onClick={handleRefresh} disabled={loading}>
+                {loading ? '⟳' : '↻'}
+              </button>
+            </div>
             <div className="stats-grid">
               <div className="stats-item">
                 <span className="stats-label">today</span>

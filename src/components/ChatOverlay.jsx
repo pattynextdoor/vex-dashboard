@@ -38,12 +38,26 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
     onStatusUpdate('thinking', 'thinking')
     
     try {
-      // TODO: Replace with actual OpenClaw API call
-      // const response = await fetch('/v1/chat/completions', { ... });
+      // Real OpenClaw API call
+      const response = await fetch('/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_GATEWAY_TOKEN}`
+        },
+        body: JSON.stringify({
+          model: 'anthropic/claude-sonnet-4-20250514',
+          messages: [{ role: 'user', content: text }],
+          stream: false
+        })
+      })
       
-      // Simulated response for now
-      await new Promise(r => setTimeout(r, 1500))
-      const reply = `I hear you. This is a placeholder — once connected to the gateway, I'll respond for real.`
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      const reply = data.choices?.[0]?.message?.content || 'No response received.'
       
       addMessage('vex', reply)
       onActivityUpdate(0.3)
@@ -56,9 +70,10 @@ function ChatOverlay({ onStatusUpdate, onActivityUpdate }) {
       }, 2000)
       
     } catch (err) {
+      console.error('Chat API error:', err)
       addMessage('vex', `Connection error: ${err.message}`)
       onActivityUpdate(0)
-      onStatusUpdate('', 'disconnected')
+      onStatusUpdate('error', 'disconnected')
     }
   }
 
