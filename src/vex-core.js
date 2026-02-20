@@ -25,11 +25,21 @@ export class VexCore {
     this.renderer.setClearColor(0x060609, 1);
     this.container.appendChild(this.renderer.domElement);
 
-    this.resizeHandler = () => this.onResize();
+    this.resizeHandler = this.debounce(() => this.onResize(), 100);
     this.mouseMoveHandler = (e) => this.onMouseMove(e);
+    this.orientationHandler = () => {
+      // Handle orientation change with delay to ensure viewport settles
+      setTimeout(() => this.onResize(), 100);
+    };
 
     window.addEventListener('resize', this.resizeHandler);
     window.addEventListener('mousemove', this.mouseMoveHandler);
+    window.addEventListener('orientationchange', this.orientationHandler);
+    
+    // Use visualViewport API if available for more accurate mobile sizing
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', this.resizeHandler);
+    }
   }
 
   onMouseMove(event) {
@@ -94,10 +104,26 @@ export class VexCore {
     this.targetActivity = Math.max(0, Math.min(1, level));
   }
 
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   onResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    // Use visualViewport if available for better mobile support
+    const width = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
   }
 
   animate() {
@@ -127,6 +153,11 @@ export class VexCore {
     }
     window.removeEventListener('resize', this.resizeHandler);
     window.removeEventListener('mousemove', this.mouseMoveHandler);
+    window.removeEventListener('orientationchange', this.orientationHandler);
+    
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', this.resizeHandler);
+    }
 
     if (this.particles) {
       this.particles.geometry.dispose();
